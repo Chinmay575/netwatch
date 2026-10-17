@@ -1,0 +1,10 @@
+[package]
+name = "netwatch"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+futures-lite = "2.6.1"
+time = { version = "0.3.55", features = ["formatting", "macros", "local-offset"] }
+tokio = { version = "1.53.3", features = ["rt", "macros", "time"] }
+zbus = "5.19.0"
