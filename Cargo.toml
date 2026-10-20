@@ -5,6 +5,9 @@ edition = "2024"
 
 [dependencies]
 futures-lite = "2.6.1"
-time = { version = "0.3.55", features = ["formatting", "macros", "local-offset"] }
-tokio = { version = "1.53.3", features = ["rt", "macros", "time"] }
+thiserror = "2.0.21"
+tokio = { version = "1.53.3", features = ["rt", "macros", "time", "sync"] }
 zbus = "5.19.0"
+
+[dev-dependencies]
+tokio = { version = "1.53.3", features = ["test-util", "rt", "macros", "time", "sync"] }

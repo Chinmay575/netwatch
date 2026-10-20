@@ -1,5 +1,7 @@
+use crate::ConnectivityError;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ConnectivityState {
+pub enum ConnectivityState {
     /// No network of any kind is up.
     Offline,
     /// Behind a captive portal; full Internet access needs a login.
@@ -18,17 +20,13 @@ impl ConnectivityState {
     /// `Portal` counts as no Internet (a login is still needed) and `Unknown`
     /// counts as no Internet too, so callers that must not act on a guess
     /// should check for `Unknown` themselves.
-    #[cfg_attr(
-        not(test),
-        expect(dead_code, reason = "used by the BLE beacon trigger in the next phase")
-    )]
-    pub(crate) fn has_internet(self) -> bool {
+    pub fn has_internet(self) -> bool {
         self == ConnectivityState::Full
     }
 }
 
 impl TryFrom<u32> for ConnectivityState {
-    type Error = String;
+    type Error = ConnectivityError;
 
     fn try_from(value: u32) -> Result<Self, Self::Error> {
         match value {
@@ -37,7 +35,7 @@ impl TryFrom<u32> for ConnectivityState {
             2 => Ok(ConnectivityState::Portal),
             3 => Ok(ConnectivityState::Limited),
             4 => Ok(ConnectivityState::Full),
-            other => Err(format!("unrecognized value '{other}'")),
+            other => Err(ConnectivityError::UnknownValue(other)),
         }
     }
 }
@@ -69,7 +67,9 @@ mod tests {
 
     #[test]
     fn rejects_unknown_number() {
-        let err = ConnectivityState::try_from(7u32).unwrap_err();
-        assert!(err.contains('7'));
+        assert_eq!(
+            ConnectivityState::try_from(7u32),
+            Err(ConnectivityError::UnknownValue(7))
+        );
     }
 }
